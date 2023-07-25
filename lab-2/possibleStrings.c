@@ -20,14 +20,14 @@ void swap(char *a, char *b) {
 }
 
 // checks if a string has only 1 occurence of 'xyz' in O(N) time
-int isFeasible(char *s, int n) {
+bool isFeasible(char *s, int n) {
 	int cnt=0;
 	for (int i=0; i<n-2; i++) {
 		if (s[i]=='x' && s[i+1]=='y' && s[i+2]=='z') {
 			cnt++;
 		}
 	}
-	return (cnt==1)?1:0;
+	return (cnt==1)?true:false;
 }
 
 // Find the next lexicographically greater permutation of the array
@@ -76,7 +76,7 @@ ll searchIt2(int n) {
 
 			// generate and test new permutations iteratively
 			do {
-				if (isFeasible(s,n)==1) {
+				if (isFeasible(s,n)==true) {
 					ans++;
 				}
 			}
@@ -114,7 +114,7 @@ ll searchIt(int n, ll pow3[20], ll ncr[20][20]) {
 // generates all allowed substrings in time complexity of O(N*3^N)
 ll searchEx(char *s, int ind, int n) {
 	if (ind==n) {
-		return isFeasible(s,n);
+		return isFeasible(s,n)==true;
 	}
 	// generate all combos
 	ll ans=0;
@@ -188,7 +188,7 @@ int main() {
 
 	// assertion for checking if all counts equal
 	assert((ansEx==ansIt) && (ansIt==ansIt2));
-	printf("Check passed: All counts equal.\n");
+	printf("Check passed: All counts equal.\n\n");
 
 	return 0;
 }
