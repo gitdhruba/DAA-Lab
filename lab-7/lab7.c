@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Function to find maximum of two numbers
 int max(int a, int b)
 {
     return a >= b ? a : b;
 }
 
+// Function to reverse an array
 void rev_arr(int *arr, int n)
 {
     int i = 0, j = n - 1;
@@ -19,6 +21,8 @@ void rev_arr(int *arr, int n)
     }
 }
 
+// Merge Sort
+// TC: O(nlogn)
 void msort(int *arr, int l, int r)
 {
     if (l >= r)
@@ -47,6 +51,8 @@ void msort(int *arr, int l, int r)
         arr[idx + l] = tmp[idx];
 }
 
+// Function to schedule orders(A)
+// TC: O(n*k)
 void schedule_orders_a(int *arr, int n, int k)
 {
     int schedule[k][n + 1];
@@ -79,7 +85,6 @@ void schedule_orders_a(int *arr, int n, int k)
     int close_time = -1;
     for (int i = 0; i < k; i++)
     {
-        // printf("%d \n",time[i]);
         close_time = max(close_time, time[i]);
     }
     printf("Order Schedule:\n");
@@ -93,10 +98,12 @@ void schedule_orders_a(int *arr, int n, int k)
         }
         printf("\n");
     }
-    printf("Closing time is %d\n", close_time);
-    printf("Waiting time= %d\n", wait_time);
+    printf("Cafe closes at time %d\n", close_time);
+    printf("Total Waiting time= %d\n", wait_time);
 }
 
+// Function to schedule orders(C)
+// TC: O(nlogn + n*k)
 void schedule_orders_c(int *arr, int n, int k)
 {
     int schedule[k][n + 1];
@@ -109,6 +116,9 @@ void schedule_orders_c(int *arr, int n, int k)
     int time[k];
     for (int i = 0; i < k; i++)
         time[i] = 0;
+    int sch_idx[k];
+    for (int i = 0; i < k; i++)
+        sch_idx[i] = 0;
 
     for (int i = 0; i < n; i++)
     {
@@ -122,73 +132,26 @@ void schedule_orders_c(int *arr, int n, int k)
                 min_idx = j;
             }
         }
-        schedule[min_idx][i] = arr[i];
+        for (int j = 0; j < n; j++)
+        {
+            if (schedule[min_idx][j] == 0)
+            {
+                schedule[min_idx][j] = arr[i];
+                sch_idx[min_idx]++;
+                break;
+            }
+        }
         time[min_idx] += arr[i];
     }
     int close_time = -1;
     for (int i = 0; i < k; i++)
     {
-        // printf("%d \n",time[i]);
         close_time = max(close_time, time[i]);
     }
-
-    int sch_idx[n];
-    int new_schedule[k][n];
-    for (int i = 0; i < k; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
-            new_schedule[i][j] = 0;
-        }
-    }
-    for (int i = 0; i < k; i++)
-    {
-        int idx = 0;
-        for (int j = 0; j < n; j++)
-        {
-            if (schedule[i][j] != 0)
-            {
-                new_schedule[i][idx++] = schedule[i][j];
-            }
-        }
-        sch_idx[i] = idx;
-    }
     printf("Order Schedule:\n");
     for (int i = 0; i < k; i++)
     {
-        rev_arr(new_schedule[i], sch_idx[i]);
-        printf("Counter %d: ", i + 1);
-        for (int j = 0; j < n; j++)
-        {
-            if (new_schedule[i][j] != 0)
-                printf("%d ", new_schedule[i][j]);
-        }
-        printf("\n");
-
-        int curr = 0, x = 0;
-        for (int j = 0; j < sch_idx[i] - 1; j++)
-        {
-            x += new_schedule[i][j];
-            curr += x;
-        }
-
-        wait_time += curr;
-    }
-    printf("Closing time is %d\n", close_time);
-    printf("Waiting time= %d\n", wait_time);
-}
-
-void schedule_orders_b(int *arr, int n, int k)
-{
-    msort(arr, 0, n - 1);
-    schedule_orders_a(arr, n, k);
-}
-
-void print_schedule(int **schedule, int n, int k)
-{
-    printf("Order Schedule:\n");
-    for (int i = 0; i < k; i++)
-    {
+        rev_arr(schedule[i], sch_idx[i]);
         printf("Counter %d: ", i + 1);
         for (int j = 0; j < n; j++)
         {
@@ -196,8 +159,29 @@ void print_schedule(int **schedule, int n, int k)
                 printf("%d ", schedule[i][j]);
         }
         printf("\n");
+
+        // Calculate waiting time
+        int tmp = 0, sum = 0;
+        for (int j = 0; j < sch_idx[i] - 1; j++)
+        {
+            sum += schedule[i][j];
+            tmp += sum;
+        }
+        wait_time += tmp;
     }
+    printf("Cafe closes at time %d\n", close_time);
+    printf("Total Waiting time= %d\n", wait_time);
 }
+
+// Function to schedule orders(B)
+// TC: O(nlogn + n*k)
+void schedule_orders_b(int *arr, int n, int k)
+{
+    msort(arr, 0, n - 1);
+    schedule_orders_a(arr, n, k);
+}
+
+// Main Function
 int main()
 {
     int n, k;
@@ -214,12 +198,14 @@ int main()
         scanf("%d", &arr[i]);
     }
 
-    printf("Part a\n");
+    printf("\nPart (a)\n");
     schedule_orders_a(arr, n, k);
+    printf("\n --- \n");
 
-    printf("\nPart b\n");
+    printf("\nPart (b)\n");
     schedule_orders_b(arr, n, k);
+    printf("\n --- \n");
 
-    printf("\nPart c\n");
+    printf("\nPart (c)\n");
     schedule_orders_c(arr, n, k);
 }
